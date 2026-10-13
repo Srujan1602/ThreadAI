@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pickup Request — ThreadAI</title>
+  <meta name="description" content="Schedule a doorstep pickup for your donated or recyclable clothing." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-protected="user">
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html" class="active">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ Page head ============ -->
+    <section class="page-head">
+      <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Pickup Request</div>
+        <h1>Schedule a Doorstep Pickup</h1>
+        <p>
+          Tell us about the clothes you're passing on and pick a convenient date.
+          It takes about a minute.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Form ============ -->
+    <section class="section">
+      <div class="container" style="max-width: 820px;">
+
+        <div class="alert info show" id="serverBanner" style="display: none;"></div>
+
+        <!-- Filled from a saved AI analysis (Analyze page) if present -->
+        <div class="alert info" id="analysisPrefill"></div>
+
+        <div class="form-card" id="formCard">
+          <h2 style="font-size: 1.45rem; margin-bottom: 6px;">Pickup details</h2>
+          <p style="color: var(--muted); margin-bottom: 26px;">
+            Fields marked with <span style="color: var(--terracotta);">*</span> are required.
+            Your request is saved to your account once submitted.
+          </p>
+
+          <form id="pickupForm" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="category">Clothing category <span style="color: var(--terracotta);">*</span></label>
+                <select id="category" name="clothing_category" required>
+                  <option value="">Select a category</option>
+                  <option>Shirts &amp; Tops</option>
+                  <option>Jeans &amp; Trousers</option>
+                  <option>Dresses</option>
+                  <option>Jackets &amp; Coats</option>
+                  <option>Sweaters &amp; Woolens</option>
+                  <option>Ethnic Wear</option>
+                  <option>Kids Clothing</option>
+                  <option>Footwear</option>
+                  <option>Bags &amp; Accessories</option>
+                  <option>Household Textiles</option>
+                </select>
+                <p class="error-msg">Please choose a clothing category.</p>
+              </div>
+
+              <div class="field">
+                <label for="condition">Condition <span style="color: var(--terracotta);">*</span></label>
+                <select id="condition" name="clothing_condition" required>
+                  <option value="">Select condition</option>
+                  <option>Like New</option>
+                  <option>Good</option>
+                  <option>Fair</option>
+                  <option>Worn</option>
+                </select>
+                <p class="error-msg">Please choose the condition.</p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="quantity">Quantity (pieces) <span style="color: var(--terracotta);">*</span></label>
+                <input type="number" id="quantity" name="quantity" min="1" max="100" placeholder="e.g. 4" required />
+                <p class="error-msg">Enter a quantity between 1 and 100.</p>
+              </div>
+
+              <div class="field">
+                <label for="pickupDate">Preferred pickup date <span style="color: var(--terracotta);">*</span></label>
+                <input type="date" id="pickupDate" name="pickup_date" required />
+                <p class="error-msg">Pick a future date for your pickup.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Request type <span style="color: var(--terracotta);">*</span></label>
+              <div class="radio-group">
+                <label class="radio-chip">
+                  <input type="radio" name="donationType" value="donate" checked />
+                  <span>💚 Donate</span>
+                </label>
+                <label class="radio-chip">
+                  <input type="radio" name="donationType" value="recycle" />
+                  <span>♻️ Recycle</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="description">Description <span class="hint">(optional)</span></label>
+              <textarea id="description" name="description" placeholder="e.g. 4 cotton shirts in good condition, freshly washed…"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="address">Pickup address <span style="color: var(--terracotta);">*</span></label>
+              <textarea id="address" name="pickup_address" placeholder="House / flat, street, area, city, pincode" required></textarea>
+              <p class="error-msg">Please enter a complete pickup address (at least 10 characters).</p>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="phone">Contact number <span style="color: var(--terracotta);">*</span></label>
+                <input type="tel" id="phone" name="contact_phone" placeholder="e.g. 98450 11223" required />
+                <p class="error-msg">Enter a valid contact number (8–15 digits).</p>
+              </div>
+
+              <div class="field">
+                <label for="email">Email <span class="hint">(optional)</span></label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" />
+                <p class="error-msg">Enter a valid email address.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-row">
+                <input type="checkbox" id="agree" />
+                <span>I confirm these clothes are clean, dry, and ready for donation or recycling. <span style="color: var(--terracotta);">*</span></span>
+              </label>
+              <p class="error-msg">Please confirm before submitting.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn" style="margin-top: 8px;">
+              Submit Request
+            </button>
+            <p class="center" style="font-size: 0.82rem; color: var(--muted); margin-top: 14px;">
+              🔒 Your request is stored securely in your account — visible only to you and the admin team.
+            </p>
+          </form>
+        </div>
+
+        <!-- Success state (shown after the database confirms the insert) -->
+        <div class="success-state" id="successState" style="display: none;">
+          <div class="big">✓</div>
+          <h2>Your clothing pickup request has been submitted!</h2>
+          <p id="successCopy">
+            Your request was saved successfully. You can track its status any time
+            from <strong>My Requests</strong>.
+          </p>
+          <div class="ref" id="refCode">—</div>
+          <div style="display: flex; gap: 12px; justify-content: center; margin-top: 26px; flex-wrap: wrap;">
+            <a href="requests.html" class="btn btn-primary">View My Requests</a>
+            <button class="btn btn-outline" id="againBtn">Submit another request</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+          <p>An AI-powered clothing reuse and recycling platform for a more sustainable fashion future.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="analyze.html">Analyze Clothes</a></li>
+            <li><a href="pickup.html">Pickup Request</a></li>
+            <li><a href="requests.html">My Requests</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="admin.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>Give Every Thread a Second Life 🌱</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    /* ----- Create a pickup request via POST /api/requests ----- */
+    const form = document.getElementById("pickupForm");
+    const formCard = document.getElementById("formCard");
+    const successState = document.getElementById("successState");
+    const submitBtn = document.getElementById("submitBtn");
+    const pickupDate = document.getElementById("pickupDate");
+
+    const today = new Date().toISOString().split("T")[0];
+    pickupDate.min = today;
+
+    /* ----- Prefill from a saved AI analysis (set by analyze.html) ----- */
+    (function prefillFromAnalysis() {
+      let saved = null;
+      try { saved = JSON.parse(sessionStorage.getItem("threadai_analysis")); } catch (_err) { /* ignore */ }
+      if (!saved || !saved.at || Date.now() - saved.at > 30 * 60 * 1000) return; // 30 min freshness
+      try { sessionStorage.removeItem("threadai_analysis"); } catch (_err) { /* ignore */ }
+
+      const categorySel = document.getElementById("category");
+      const conditionSel = document.getElementById("condition");
+      const hasOption = (sel, v) => Array.from(sel.options).some((o) => o.value === v);
+      if (saved.category && hasOption(categorySel, saved.category)) {
+        categorySel.value = saved.category;
+      }
+      if (saved.condition && hasOption(conditionSel, saved.condition)) {
+        conditionSel.value = saved.condition;
+      }
+      if (saved.recommendation === "Recycle") {
+        const recycleRadio = form.querySelector('input[name="donationType"][value="recycle"]');
+        if (recycleRadio) recycleRadio.checked = true;
+      }
+
+      const note = document.getElementById("analysisPrefill");
+      note.innerHTML =
+        "🔬 Prefilled from your <strong>AI analysis</strong>" +
+        (saved.category ? " — <strong>" + escapeHtml(saved.category) + "</strong>" : "") +
+        (saved.condition ? " · <strong>" + escapeHtml(saved.condition) + "</strong>" : "") +
+        (saved.recommendation ? " · AI suggests <strong>" + escapeHtml(saved.recommendation) + "</strong>" : "") +
+        ". Review and correct anything before submitting — the AI's estimate is not final.";
+      note.classList.add("show");
+    })();
+
+    function validateDate(input) {
+      const ok = input.value && input.value >= today;
+      return setFieldError(input, !ok);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearApiErrors(form);
+
+      const category = document.getElementById("category");
+      const condition = document.getElementById("condition");
+      const quantity = document.getElementById("quantity");
+      const address = document.getElementById("address");
+      const phone = document.getElementById("phone");
+      const agree = document.getElementById("agree");
+
+      const checks = [
+        validateRequired(category),
+        validateRequired(condition),
+        setFieldError(quantity, !(quantity.value >= 1 && quantity.value <= 100)),
+        validateDate(pickupDate),
+        setFieldError(address, address.value.trim().length < 10),
+        validatePhone(phone),
+        setFieldError(agree, !agree.checked),
+      ];
+      if (checks.includes(false)) {
+        const firstError = form.querySelector(".field.error");
+        if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+        toast("Check the form", "Please fix the highlighted fields and try again.", "error");
+        return;
+      }
+
+      const payload = {
+        clothing_category: category.value,
+        clothing_condition: condition.value,
+        quantity: Number(quantity.value),
+        request_type: form.querySelector('input[name="donationType"]:checked').value,
+        description: document.getElementById("description").value.trim(),
+        pickup_address: address.value.trim(),
+        pickup_date: pickupDate.value,
+        contact_phone: phone.value.trim(),
+      };
+
+      setLoading(submitBtn, true, "Submitting…");
+      try {
+        const data = await API.post("/api/requests", payload);
+        // Success is shown only now — after the database confirmed the insert
+        document.getElementById("refCode").textContent = data.request.request_code;
+        document.getElementById("successCopy").innerHTML =
+          "Saved to your account as <strong>" +
+          escapeHtml(data.request.request_code) +
+          "</strong> with status <strong>" +
+          escapeHtml(data.request.status || "Pending") +
+          "</strong>. Track your request status in <strong>My Requests</strong>.";
+        formCard.style.display = "none";
+        successState.style.display = "block";
+        successState.scrollIntoView({ behavior: "smooth", block: "center" });
+        toast("Request submitted", `Saved as ${data.request.request_code}.`);
+      } catch (err) {
+        setLoading(submitBtn, false);
+        if (err.status === 401) {
+          window.location.href = "login.html?next=pickup.html";
+          return;
+        }
+        if (err.errors && showApiErrors(form, err)) {
+          const first = form.querySelector(".field.error");
+          if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        toast("Submission failed", err.message, "error");
+      }
+    });
+
+    document.getElementById("againBtn").addEventListener("click", () => {
+      form.reset();
+      form.querySelectorAll(".field").forEach((f) => f.classList.remove("error"));
+      successState.style.display = "none";
+      formCard.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>

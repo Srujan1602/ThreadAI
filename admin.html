@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — ThreadAI</title>
+  <meta name="description" content="Admin console for managing clothing pickup requests." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-protected="admin">
+
+  <!-- ============ Admin layout ============ -->
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a href="index.html" class="logo" style="color: #fff; padding: 6px 10px 18px;">
+        <span class="logo-mark">🧵</span>ThreadAI
+      </a>
+      <div class="side-title">Admin</div>
+      <a href="admin.html" class="active">📊 Overview</a>
+      <a href="#requests-panel">📋 Pickup Requests</a>
+      <a href="#charts-panel">📈 Analytics</a>
+      <a href="#feedback-panel">💬 Feedback</a>
+      <div class="side-divider"></div>
+      <div class="side-title">General</div>
+      <a href="index.html">🏠 Back to Website</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="#" id="adminLogout">🚪 Logout</a>
+      <div class="side-user">
+        <div class="avatar">AD</div>
+        <div>
+          <strong id="adminName">Admin</strong>
+          <span id="adminEmail">signed in</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+      <div class="dash-head">
+        <div>
+          <h1>Admin Overview</h1>
+          <p>Manage users, pickup requests, and donation analytics.</p>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-outline btn-sm" style="padding: 11px 20px;" id="refreshBtn">↻ Refresh</button>
+          <a href="pickup.html" class="btn btn-primary btn-sm" style="padding: 11px 20px;">+ New Request</a>
+        </div>
+      </div>
+
+      <div id="adminError" class="alert warn show" style="display: none;"></div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">👥</div></div>
+          <div class="stat-num" id="aUsers">—</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">📦</div></div>
+          <div class="stat-num" id="aRequests">—</div>
+          <div class="stat-label">Total Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">⏳</div></div>
+          <div class="stat-num" id="aPending">—</div>
+          <div class="stat-label">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">✅</div></div>
+          <div class="stat-num" id="aCompleted">—</div>
+          <div class="stat-label">Completed Pickups</div>
+        </div>
+      </div>
+
+      <!-- Requests management -->
+      <div class="panel" id="requests-panel">
+        <div class="panel-head">
+          <h2>Pickup Requests</h2>
+          <span class="badge badge-accepted" id="reqCountBadge">live data</span>
+        </div>
+        <div class="panel-body" style="padding-bottom: 8px;">
+          <div class="toolbar" style="margin-bottom: 16px;">
+            <div class="search-box">
+              <input type="text" id="adminSearch" placeholder="Search by code, user, email, or clothing…" />
+            </div>
+            <div class="filter-chips" id="adminChips">
+              <button class="chip active" data-status="">All</button>
+              <button class="chip" data-status="Pending">Pending</button>
+              <button class="chip" data-status="Accepted">Accepted</button>
+              <button class="chip" data-status="Pickup Scheduled">Scheduled</button>
+              <button class="chip" data-status="Picked Up">Picked Up</button>
+              <button class="chip" data-status="Completed">Completed</button>
+              <button class="chip" data-status="Rejected">Rejected</button>
+            </div>
+          </div>
+        </div>
+        <div id="adminRequestsWrap"></div>
+        <div class="pagination" id="adminPagination" style="display: none; padding-bottom: 20px;">
+          <button class="btn btn-outline btn-sm" id="adminPrev">← Previous</button>
+          <span class="page-info" id="adminPageInfo">Page 1 of 1</span>
+          <button class="btn btn-outline btn-sm" id="adminNext">Next →</button>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="panel" id="charts-panel">
+        <div class="panel-head">
+          <h2>Donation Analytics</h2>
+          <span class="badge badge-accepted">from database</span>
+        </div>
+        <div class="panel-body">
+          <div class="grid grid-2">
+            <div>
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">Requests per month</h3>
+              <p style="font-size: 0.84rem; color: var(--muted); margin-bottom: 14px;">Last 6 months, live from MySQL</p>
+              <div class="bar-chart" id="trendChart"></div>
+            </div>
+            <div>
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">Donate vs Recycle</h3>
+              <p style="font-size: 0.84rem; color: var(--muted); margin-bottom: 14px;">Split across all current requests</p>
+              <div class="donut-wrap">
+                <div class="donut" id="splitDonut">
+                  <div class="donut-hole">
+                    <div>
+                      <strong id="donutTotal">0</strong>
+                      <span>requests</span>
+                    </div>
+                  </div>
+                </div>
+                <ul class="legend" style="flex: 1; min-width: 180px;">
+                  <li><span class="dot" style="background: var(--forest-3);"></span> Donate <b id="lDonate">0</b></li>
+                  <li><span class="dot" style="background: var(--amber);"></span> Recycle <b id="lRecycle">0</b></li>
+                  <li><span class="dot" style="background: var(--sage);"></span> Rejected <b id="lRejected">0</b></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="panel" id="feedback-panel">
+        <div class="panel-head">
+          <h2>User Feedback</h2>
+          <span class="badge badge-demo" id="feedbackCount">0 entries</span>
+        </div>
+        <div id="feedbackWrap"></div>
+      </div>
+
+      <!-- Recent users -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Registered Users</h2>
+          <span class="badge badge-demo" id="userCountBadge">0 users</span>
+        </div>
+        <div id="usersWrap"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============ View / action modal ============ -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3>Request <span class="mono" id="vId">—</span></h3>
+        <button class="modal-close" id="vClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 14px;" id="vStatus"></div>
+        <div id="vTimeline"></div>
+        <div class="detail-list" style="margin-top: 18px;" id="vDetails"></div>
+        <h4 style="font-family: var(--font-body); font-size: 0.9rem; color: var(--forest); margin: 22px 0 8px; text-transform: uppercase; letter-spacing: 0.08em;">
+          Status history
+        </h4>
+        <div id="vHistory" style="font-size: 0.9rem; color: var(--muted);"></div>
+        <div class="field" id="scheduleField" style="display: none; margin-top: 18px;">
+          <label for="scheduleDate">Pickup date</label>
+          <input type="date" id="scheduleDate" />
+          <p class="error-msg">Choose today or a later date.</p>
+        </div>
+      </div>
+      <div class="modal-foot" id="vFoot">
+        <button class="btn btn-primary btn-sm" id="vDone">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/helpers.js"></script>
+  <script>
+    /* ==================================================================
+       Admin dashboard — every action calls a protected admin API and the
+       UI only updates after the backend confirms success.
+       ================================================================== */
+    const adminState = { search: "", status: "", page: 1, limit: 10, totalPages: 1 };
+    const adminWrap = document.getElementById("adminRequestsWrap");
+    const viewModal = document.getElementById("viewModal");
+    let adminSearchTimer = null;
+    let openId = null;
+
+    const FLOW = {
+      Pending: [{ act: "accept", label: "Accept", cls: "btn-outline" },
+                { act: "reject", label: "Reject", cls: "btn-danger-ghost" }],
+      Accepted: [{ act: "reject", label: "Reject", cls: "btn-danger-ghost" },
+                 { act: "schedule", label: "Schedule Pickup…", cls: "btn-outline" }],
+      "Pickup Scheduled": [{ act: "advance", label: "Mark Picked Up", cls: "btn-outline" }],
+      "Picked Up": [{ act: "advance", label: "Mark Completed", cls: "btn-primary" }],
+      Completed: [],
+      Rejected: [],
+    };
+
+    /* ---------- identity ---------- */
+    async function loadAdmin() {
+      try {
+        const me = await API.get("/api/auth/me");
+        document.getElementById("adminName").textContent = me.user.full_name;
+        document.getElementById("adminEmail").textContent = me.user.email;
+      } catch (_err) {
+        return; // redirect handled by api.js
+      }
+      refreshAll();
+    }
+
+    document.getElementById("adminLogout").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+
+    /* ---------- stats ---------- */
+    async function loadStats() {
+      try {
+        const data = await API.get("/api/admin/stats");
+        const s = data.stats;
+        document.getElementById("aUsers").textContent = s.total_users;
+        document.getElementById("aRequests").textContent = s.total_requests;
+        document.getElementById("aPending").textContent = s.pending;
+        document.getElementById("aCompleted").textContent = s.completed;
+
+        // Trend bar chart
+        const trend = s.trend.length ? s.trend : [{ label: "—", value: 0 }];
+        const max = Math.max(...trend.map((t) => t.value), 1);
+        document.getElementById("trendChart").innerHTML = trend
+          .map(
+            (t) => `
+          <div class="bar-col">
+            <div class="bar" style="height: ${Math.max(4, Math.round((t.value / max) * 100))}%"><b>${t.value}</b></div>
+            <div class="bar-label">${escapeHtml(t.label)}</div>
+          </div>`
+          )
+          .join("");
+
+        // Donate vs Recycle donut
+        const { donate, recycle, rejected } = s.split;
+        const total = donate + recycle + rejected || 1;
+        const p1 = (donate / total) * 100;
+        const p2 = p1 + (recycle / total) * 100;
+        document.getElementById("splitDonut").style.background =
+          `conic-gradient(var(--forest-3) 0 ${p1}%, var(--amber) ${p1}% ${p2}%, var(--sage) ${p2}% 100%)`;
+        document.getElementById("donutTotal").textContent = s.total_requests;
+        document.getElementById("lDonate").textContent = donate;
+        document.getElementById("lRecycle").textContent = recycle;
+        document.getElementById("lRejected").textContent = rejected;
+        document.getElementById("feedbackCount").textContent =
+          s.feedback_count + " entr" + (s.feedback_count === 1 ? "y" : "ies");
+      } catch (err) {
+        showAdminError("Stats unavailable: " + err.message);
+      }
+    }
+
+    function showAdminError(msg) {
+      const el = document.getElementById("adminError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+
+    /* ---------- requests table ---------- */
+    async function loadRequests() {
+      adminWrap.innerHTML = loadingStateHtml("Loading requests…");
+      document.getElementById("adminPagination").style.display = "none";
+      try {
+        const p = new URLSearchParams({ page: adminState.page, limit: adminState.limit });
+        if (adminState.search) p.set("search", adminState.search);
+        if (adminState.status) p.set("status", adminState.status);
+        const data = await API.get("/api/admin/requests?" + p.toString());
+        adminState.totalPages = data.pagination.totalPages;
+        document.getElementById("reqCountBadge").textContent =
+          data.pagination.total + " total";
+
+        if (!data.requests.length) {
+          adminWrap.innerHTML =
+            '<div class="panel-body">' +
+            emptyStateHtml("🗂️", "No requests match your filters.", "Try a different search or status filter.") +
+            "</div>";
+          return;
+        }
+
+        adminWrap.innerHTML = `
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>User</th><th>Clothing</th><th>Type</th><th>Qty</th>
+                  <th>Pickup</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.requests
+                  .map((r) => {
+                    const actions = (FLOW[r.status] || [])
+                      .map(
+                        (a) =>
+                          `<button class="btn ${a.cls} btn-sm" data-act="${a.act}" data-id="${r.id}">${a.label}</button>`
+                      )
+                      .join(" ");
+                    return `
+                  <tr>
+                    <td><span class="mono">${escapeHtml(r.request_code || "#" + r.id)}</span></td>
+                    <td><strong>${escapeHtml(r.user_name || "?")}</strong><br /><span style="font-size: 0.78rem;">${escapeHtml(r.user_email || "")}</span></td>
+                    <td>${escapeHtml(r.clothing_category)}</td>
+                    <td>${typeEmoji(r.request_type)} ${typeLabel(r.request_type)}</td>
+                    <td>${r.quantity}</td>
+                    <td>${formatDate(r.pickup_date)}</td>
+                    <td>${statusBadge(r.status)}</td>
+                    <td style="white-space: nowrap;">
+                      <button class="btn btn-ghost btn-sm" data-act="view" data-id="${r.id}">View</button>
+                      ${actions}
+                    </td>
+                  </tr>`;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+          </div>`;
+
+        adminWrap.querySelectorAll("button[data-act]").forEach((btn) => {
+          btn.addEventListener("click", () =>
+            handleAction(btn.dataset.act, Number(btn.dataset.id))
+          );
+        });
+
+        if (adminState.totalPages > 1) {
+          document.getElementById("adminPagination").style.display = "flex";
+          document.getElementById("adminPageInfo").textContent =
+            `Page ${adminState.page} of ${adminState.totalPages}`;
+          document.getElementById("adminPrev").disabled = adminState.page <= 1;
+          document.getElementById("adminNext").disabled = adminState.page >= adminState.totalPages;
+        }
+      } catch (err) {
+        adminWrap.innerHTML = errorStateHtml("Could not load requests", err.message);
+      }
+    }
+
+    /* ---------- actions (backend confirms first, then UI refreshes) ---------- */
+    async function handleAction(act, id) {
+      if (act === "view") return openView(id);
+
+      if (act === "schedule") return openView(id, true);
+
+      const map = {
+        accept: { status: "Accepted" },
+        reject: { status: "Rejected" },
+        advance: null, // resolved below
+      };
+
+      try {
+        if (act === "advance") {
+          const row = await getRow(id);
+          const next = {
+            Accepted: "Pickup Scheduled",
+            "Pickup Scheduled": "Picked Up",
+            "Picked Up": "Completed",
+          }[row.status];
+          if (!next) {
+            toast("Nothing to do", `No further transition from ${row.status}.`, "warn");
+            return;
+          }
+          await API.patch(`/api/admin/requests/${id}/status`, { status: next });
+          toast("Status updated", `${row.request_code} → ${next}`);
+        } else {
+          const body = map[act];
+          const row = await getRow(id);
+          await API.patch(`/api/admin/requests/${id}/status`, body);
+          toast("Status updated", `${row.request_code} → ${body.status}`, act === "reject" ? "warn" : "success");
+        }
+        refreshAll();
+        if (viewModal.classList.contains("open")) openView(id);
+      } catch (err) {
+        toast("Update failed", err.message, "error");
+      }
+    }
+
+    async function getRow(id) {
+      const data = await API.get("/api/admin/requests/" + id);
+      return data.request;
+    }
+
+    /* ---------- view modal ---------- */
+    async function openView(id, focusSchedule) {
+      openId = id;
+      document.getElementById("vId").textContent = "…";
+      document.getElementById("vDetails").innerHTML = "";
+      document.getElementById("vHistory").innerHTML = loadingStateHtml("Loading…");
+      document.getElementById("scheduleField").style.display = "none";
+      viewModal.classList.add("open");
+      document.body.style.overflow = "hidden";
+
+      try {
+        const data = await API.get("/api/admin/requests/" + id);
+        const r = data.request;
+        document.getElementById("vId").textContent = r.request_code || "#" + r.id;
+        document.getElementById("vStatus").innerHTML = statusBadge(r.status);
+        document.getElementById("vTimeline").innerHTML = timelineHtml(r.status);
+
+        document.getElementById("vDetails").innerHTML = [
+          ["User", `${r.user_name || "?"} (${r.user_email || "—"})`],
+          ["Clothing category", r.clothing_category],
+          ["Condition", r.clothing_condition],
+          ["Quantity", r.quantity + " pieces"],
+          ["Request type", typeLabel(r.request_type)],
+          ["Description", r.description || "—"],
+          ["Pickup address", r.pickup_address],
+          ["Preferred date", formatDate(r.pickup_date)],
+          ["Contact", r.contact_phone],
+          ["Requested on", formatDate(r.created_at)],
+        ]
+          .map(
+            (row) =>
+              '<div class="detail-row"><div class="k">' +
+              row[0] +
+              '</div><div class="v">' +
+              escapeHtml(String(row[1])) +
+              "</div></div>"
+          )
+          .join("");
+
+        document.getElementById("vHistory").innerHTML = data.history.length
+          ? data.history
+              .map(
+                (h) =>
+                  `<div class="detail-row" style="grid-template-columns: 150px 1fr;">
+                     <div class="k">${formatDate(h.created_at)}</div>
+                     <div class="v">${escapeHtml(h.old_status || "—")} → <strong>${escapeHtml(h.new_status)}</strong>
+                     ${h.note ? ` · ${escapeHtml(h.note)}` : ""}</div>
+                   </div>`
+              )
+              .join("")
+          : '<p style="color: var(--muted);">No status changes yet.</p>';
+
+        // Footer buttons follow the allowed transition map
+        const actions = FLOW[r.status] || [];
+        const foot = document.getElementById("vFoot");
+        foot.innerHTML =
+          actions
+            .map(
+              (a) =>
+                `<button class="btn ${a.cls} btn-sm" data-act="${a.act}" data-id="${r.id}">${a.label}</button>`
+            )
+            .join("") + `<button class="btn btn-primary btn-sm" id="vDone">Close</button>`;
+        foot.querySelectorAll("button[data-act]").forEach((b) =>
+          b.addEventListener("click", () => handleAction(b.dataset.act, Number(b.dataset.id)))
+        );
+        document.getElementById("vDone").addEventListener("click", closeView);
+
+        const scheduleField = document.getElementById("scheduleField");
+        if (focusSchedule) {
+          scheduleField.style.display = "block";
+          const input = document.getElementById("scheduleDate");
+          input.min = new Date().toISOString().split("T")[0];
+          input.value = r.pickup_date >= input.min ? r.pickup_date : input.min;
+          scheduleField.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Wire the Schedule button to submit the chosen date
+          const scheduleBtn = foot.querySelector('[data-act="schedule"]');
+          if (scheduleBtn) {
+            scheduleBtn.onclick = async () => {
+              if (!input.value || input.value < input.min) {
+                scheduleField.classList.add("error");
+                return;
+              }
+              scheduleField.classList.remove("error");
+              setLoading(scheduleBtn, true, "Saving…");
+              try {
+                await API.patch(`/api/admin/requests/${r.id}/status`, {
+                  status: "Pickup Scheduled",
+                  pickup_date: input.value,
+                });
+                toast("Pickup scheduled", `${r.request_code} scheduled for ${formatDate(input.value)}.`);
+                closeView();
+                refreshAll();
+              } catch (err) {
+                setLoading(scheduleBtn, false);
+                toast("Scheduling failed", err.message, "error");
+              }
+            };
+          }
+        }
+      } catch (err) {
+        document.getElementById("vDetails").innerHTML = errorStateHtml("Could not load request", err.message);
+      }
+    }
+
+    function closeView() {
+      viewModal.classList.remove("open");
+      document.body.style.overflow = "";
+      openId = null;
+    }
+
+    document.getElementById("vClose").addEventListener("click", closeView);
+    viewModal.addEventListener("click", (e) => { if (e.target === viewModal) closeView(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeView(); });
+
+    /* ---------- users + feedback ---------- */
+    async function loadUsers() {
+      const wrap = document.getElementById("usersWrap");
+      try {
+        const data = await API.get("/api/admin/users?limit=8");
+        document.getElementById("userCountBadge").textContent =
+          data.pagination.total + " users";
+        wrap.innerHTML = `
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Requests</th><th>Role</th></tr></thead>
+              <tbody>
+                ${data.users
+                  .map(
+                    (u) => `
+                  <tr>
+                    <td><strong>${escapeHtml(u.full_name)}</strong></td>
+                    <td>${escapeHtml(u.email)}</td>
+                    <td>${formatDate(u.created_at)}</td>
+                    <td>${u.request_count}</td>
+                    <td><span class="badge ${u.role === "admin" ? "badge-scheduled" : "badge-accepted"}">${escapeHtml(u.role)}</span></td>
+                  </tr>`
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>`;
+      } catch (err) {
+        wrap.innerHTML = '<div class="panel-body">' + errorStateHtml("Could not load users", err.message) + "</div>";
+      }
+    }
+
+    async function loadFeedback() {
+      const wrap = document.getElementById("feedbackWrap");
+      try {
+        const data = await API.get("/api/admin/feedback?limit=10");
+        if (!data.feedback.length) {
+          wrap.innerHTML =
+            '<div class="panel-body">' +
+            emptyStateHtml("💬", "No feedback yet", "Submissions from the contact page will appear here.") +
+            "</div>";
+          return;
+        }
+        wrap.innerHTML = `
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Rating</th><th>Message</th><th>From</th><th>Date</th></tr></thead>
+              <tbody>
+                ${data.feedback
+                  .map(
+                    (f) => `
+                  <tr>
+                    <td>${"★".repeat(f.rating)}${"☆".repeat(5 - f.rating)}</td>
+                    <td>${escapeHtml(f.message)}</td>
+                    <td>${escapeHtml(f.user_name || "Guest")}<br /><span style="font-size: 0.78rem;">${escapeHtml(f.user_email || "not signed in")}</span></td>
+                    <td>${formatDate(f.created_at)}</td>
+                  </tr>`
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>`;
+      } catch (err) {
+        wrap.innerHTML = '<div class="panel-body">' + errorStateHtml("Could not load feedback", err.message) + "</div>";
+      }
+    }
+
+    /* ---------- filters / pagination / refresh ---------- */
+    document.getElementById("adminChips").addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      document.querySelectorAll("#adminChips .chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      adminState.status = chip.dataset.status;
+      adminState.page = 1;
+      loadRequests();
+    });
+
+    document.getElementById("adminSearch").addEventListener("input", (e) => {
+      clearTimeout(adminSearchTimer);
+      adminSearchTimer = setTimeout(() => {
+        adminState.search = e.target.value.trim();
+        adminState.page = 1;
+        loadRequests();
+      }, 300);
+    });
+
+    document.getElementById("adminPrev").addEventListener("click", () => {
+      if (adminState.page > 1) { adminState.page--; loadRequests(); }
+    });
+    document.getElementById("adminNext").addEventListener("click", () => {
+      if (adminState.page < adminState.totalPages) { adminState.page++; loadRequests(); }
+    });
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+      document.getElementById("adminError").style.display = "none";
+      refreshAll();
+      toast("Refreshed", "All panels reloaded from the database.");
+    });
+
+    function refreshAll() {
+      loadStats();
+      loadRequests();
+      loadUsers();
+      loadFeedback();
+    }
+
+    loadAdmin();
+  </script>
+
+  <footer class="footer" style="margin-top: 40px;">
+    <div class="container">
+      <div class="footer-bottom" style="border: 0; padding-top: 0;">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>All actions are validated by the backend API.</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

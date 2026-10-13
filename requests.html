@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Requests — ThreadAI</title>
+  <meta name="description" content="Search, filter, and track your clothing pickup requests." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-protected="user">
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html" class="active">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ Page head ============ -->
+    <section class="page-head">
+      <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> / My Requests</div>
+        <h1>Track Your Requests</h1>
+        <p>Search, filter, and follow every donation or recycling request through its full pickup timeline.</p>
+      </div>
+    </section>
+
+    <!-- ============ Requests ============ -->
+    <section class="section">
+      <div class="container">
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by request code (TAI-0001) or clothing type…" />
+          </div>
+          <div class="filter-chips" id="filterChips">
+            <button class="chip active" data-status="">All</button>
+            <button class="chip" data-status="Pending">Pending</button>
+            <button class="chip" data-status="Accepted">Accepted</button>
+            <button class="chip" data-status="Pickup Scheduled">Pickup Scheduled</button>
+            <button class="chip" data-status="Picked Up">Picked Up</button>
+            <button class="chip" data-status="Completed">Completed</button>
+            <button class="chip" data-status="Rejected">Rejected</button>
+          </div>
+          <select id="typeFilter" class="input" style="max-width: 150px; padding: 11px 14px;">
+            <option value="">All types</option>
+            <option value="donate">Donate</option>
+            <option value="recycle">Recycle</option>
+          </select>
+          <a href="pickup.html" class="btn btn-primary btn-sm" style="padding: 11px 22px;">+ New Request</a>
+        </div>
+
+        <!-- List -->
+        <div id="requestList" class="grid" style="gap: 18px;"></div>
+
+        <div class="pagination" id="pagination" style="display: none;">
+          <button class="btn btn-outline btn-sm" id="prevPage">← Previous</button>
+          <span class="page-info" id="pageInfo">Page 1 of 1</span>
+          <button class="btn btn-outline btn-sm" id="nextPage">Next →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Detail modal ============ -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3>Request <span class="mono" id="mId">—</span></h3>
+        <button class="modal-close" id="mClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span class="badge badge-demo" id="mOwned">Your request</span>
+          <span id="mStatus"></span>
+        </div>
+        <div id="mTimeline"></div>
+        <div class="detail-list" style="margin-top: 18px;" id="mDetails"></div>
+        <h4 style="font-family: var(--font-body); font-size: 0.9rem; color: var(--forest); margin: 22px 0 8px; text-transform: uppercase; letter-spacing: 0.08em;">
+          Status history
+        </h4>
+        <div id="mHistory" style="font-size: 0.9rem; color: var(--muted);"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-danger-ghost btn-sm" id="mCancel" style="display: none;">Cancel Request</button>
+        <a href="pickup.html" class="btn btn-outline btn-sm">New similar pickup</a>
+        <button class="btn btn-primary btn-sm" id="mDone">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+          <p>An AI-powered clothing reuse and recycling platform for a more sustainable fashion future.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="analyze.html">Analyze Clothes</a></li>
+            <li><a href="pickup.html">Pickup Request</a></li>
+            <li><a href="requests.html">My Requests</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="admin.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>Give Every Thread a Second Life 🌱</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/helpers.js"></script>
+  <script>
+    /* ----- My Requests — backed by GET /api/requests (own rows only) ----- */
+    const listEl = document.getElementById("requestList");
+    const paginationEl = document.getElementById("pagination");
+    const pageInfo = document.getElementById("pageInfo");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const modal = document.getElementById("detailModal");
+
+    const state = { search: "", status: "", type: "", page: 1, limit: 6, total: 0, totalPages: 1 };
+    let searchTimer = null;
+    let openRequestId = null;
+
+    function qs() {
+      const p = new URLSearchParams({ page: state.page, limit: state.limit });
+      if (state.search) p.set("search", state.search);
+      if (state.status) p.set("status", state.status);
+      if (state.type) p.set("type", state.type);
+      return p.toString();
+    }
+
+    async function loadRequests() {
+      listEl.innerHTML = loadingStateHtml("Loading your requests…");
+      paginationEl.style.display = "none";
+      try {
+        const data = await API.get("/api/requests?" + qs());
+        state.total = data.pagination.total;
+        state.totalPages = data.pagination.totalPages;
+
+        if (!data.requests.length) {
+          listEl.innerHTML = emptyStateHtml(
+            "🧺",
+            state.search || state.status || state.type
+              ? "No requests match your filters."
+              : "You haven't submitted any requests yet.",
+            state.search || state.status || state.type
+              ? "Try a different search or filter."
+              : "Use “New Request” to schedule your first doorstep pickup."
+          );
+          return;
+        }
+
+        listEl.innerHTML = data.requests
+          .map((r) => {
+            const cancelled = r.status === "Rejected";
+            return `
+          <article class="card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start;">
+              <div style="display: flex; gap: 16px; align-items: flex-start;">
+                <div class="card-icon" style="margin: 0; flex-shrink: 0;">${typeEmoji(r.request_type)}</div>
+                <div>
+                  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 4px;">
+                    <span class="mono">${escapeHtml(r.request_code || "#" + r.id)}</span>
+                    <h3 style="font-size: 1.12rem; margin: 0;">${escapeHtml(r.clothing_category)}</h3>
+                  </div>
+                  <p style="font-size: 0.9rem;">
+                    ${typeLabel(r.request_type)} · Qty ${r.quantity} · Condition: ${escapeHtml(r.clothing_condition)}
+                  </p>
+                  <p style="font-size: 0.86rem; color: var(--muted); margin-top: 4px;">
+                    Requested ${formatDate(r.created_at)} · Pickup on ${formatDate(r.pickup_date)}
+                  </p>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                ${statusBadge(r.status)}
+                <div style="margin-top: 12px;">
+                  <button class="btn btn-outline btn-sm" data-id="${r.id}">View Details</button>
+                </div>
+              </div>
+            </div>
+            ${timelineHtml(r.status)}
+          </article>`;
+          })
+          .join("");
+
+        listEl.querySelectorAll("button[data-id]").forEach((btn) => {
+          btn.addEventListener("click", () => openDetail(Number(btn.dataset.id)));
+        });
+
+        if (state.totalPages > 1) {
+          paginationEl.style.display = "flex";
+          pageInfo.textContent = `Page ${state.page} of ${state.totalPages} · ${state.total} request${state.total === 1 ? "" : "s"}`;
+          document.getElementById("prevPage").disabled = state.page <= 1;
+          document.getElementById("nextPage").disabled = state.page >= state.totalPages;
+        }
+      } catch (err) {
+        if (err.status === 401) return; // redirect handled by api.js
+        listEl.innerHTML = errorStateHtml(
+          "Could not load your requests",
+          err.message + " — check that the backend is running, then refresh."
+        );
+      }
+    }
+
+    /* ---- filters ---- */
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        state.search = searchInput.value.trim();
+        state.page = 1;
+        loadRequests();
+      }, 300);
+    });
+
+    document.getElementById("filterChips").addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      document.querySelectorAll("#filterChips .chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.status = chip.dataset.status;
+      state.page = 1;
+      loadRequests();
+    });
+
+    typeFilter.addEventListener("change", () => {
+      state.type = typeFilter.value;
+      state.page = 1;
+      loadRequests();
+    });
+
+    document.getElementById("prevPage").addEventListener("click", () => {
+      if (state.page > 1) { state.page--; loadRequests(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    });
+    document.getElementById("nextPage").addEventListener("click", () => {
+      if (state.page < state.totalPages) { state.page++; loadRequests(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    });
+
+    /* ---- detail modal (GET /api/requests/:id — owner only) ---- */
+    async function openDetail(id) {
+      openRequestId = id;
+      document.getElementById("mId").textContent = "…";
+      document.getElementById("mDetails").innerHTML = "";
+      document.getElementById("mHistory").innerHTML = loadingStateHtml("Loading…");
+      document.getElementById("mTimeline").innerHTML = "";
+      document.getElementById("mCancel").style.display = "none";
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+
+      try {
+        const data = await API.get("/api/requests/" + id);
+        const r = data.request;
+        document.getElementById("mId").textContent = r.request_code || "#" + r.id;
+        document.getElementById("mStatus").innerHTML = statusBadge(r.status);
+        document.getElementById("mTimeline").innerHTML = timelineHtml(r.status);
+
+        document.getElementById("mDetails").innerHTML = [
+          ["Clothing category", r.clothing_category],
+          ["Condition", r.clothing_condition],
+          ["Quantity", r.quantity + " pieces"],
+          ["Request type", typeLabel(r.request_type)],
+          ["Description", r.description || "—"],
+          ["Preferred pickup date", formatDate(r.pickup_date)],
+          ["Pickup address", r.pickup_address],
+          ["Contact number", r.contact_phone],
+          ["Requested on", formatDate(r.created_at)],
+        ]
+          .map(
+            (row) =>
+              '<div class="detail-row"><div class="k">' +
+              row[0] +
+              '</div><div class="v">' +
+              escapeHtml(String(row[1])) +
+              "</div></div>"
+          )
+          .join("");
+
+        document.getElementById("mHistory").innerHTML = data.history.length
+          ? data.history
+              .map(
+                (h) =>
+                  `<div class="detail-row" style="grid-template-columns: 150px 1fr;">
+                     <div class="k">${formatDate(h.created_at)}</div>
+                     <div class="v">${escapeHtml(h.old_status || "—")} → <strong>${escapeHtml(h.new_status)}</strong>
+                     ${h.note ? ` · ${escapeHtml(h.note)}` : ""}</div>
+                   </div>`
+              )
+              .join("")
+          : '<p style="color: var(--muted);">No status changes yet.</p>';
+
+        const cancellable = r.status === "Pending" || r.status === "Accepted";
+        const cancelBtn = document.getElementById("mCancel");
+        cancelBtn.style.display = cancellable ? "" : "none";
+        cancelBtn.onclick = () => cancelRequest(r.id, r.request_code);
+      } catch (err) {
+        document.getElementById("modalBody").innerHTML =
+          '<div class="state-block state-error"><div class="state-icon">⚠️</div><p><strong>Could not load this request</strong></p><p class="state-hint">' +
+          escapeHtml(err.message) +
+          "</p></div>";
+      }
+    }
+
+    async function cancelRequest(id, code) {
+      if (!window.confirm(`Cancel request ${code}? This cannot be undone.`)) return;
+      try {
+        await API.patch(`/api/requests/${id}/cancel`);
+        toast("Request cancelled", `${code} is now marked Rejected (cancelled).`, "warn");
+        closeModal();
+        loadRequests();
+      } catch (err) {
+        toast("Could not cancel", err.message, "error");
+      }
+    }
+
+    function closeModal() {
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+      openRequestId = null;
+    }
+
+    document.getElementById("mClose").addEventListener("click", closeModal);
+    document.getElementById("mDone").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+    loadRequests();
+  </script>
+</body>
+</html>

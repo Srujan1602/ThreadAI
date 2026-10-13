@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — ThreadAI</title>
+  <meta name="description" content="Sign in to your ThreadAI account." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Auth split layout ============ -->
+  <div class="auth-page">
+    <aside class="auth-aside">
+      <div>
+        <a href="index.html" class="logo" style="color: #fff;"><span class="logo-mark">🧵</span>ThreadAI</a>
+        <h2 style="margin-top: 34px;">Give Every Thread a Second Life.</h2>
+        <p>Sign in to analyze clothes, schedule doorstep pickups, and track every request from pending to completed.</p>
+        <ul class="auth-points">
+          <li><span class="tick">✓</span> Smart clothing analysis and recommendations</li>
+          <li><span class="tick">✓</span> Free doorstep pickup scheduling</li>
+          <li><span class="tick">✓</span> Live status tracking for every request</li>
+          <li><span class="tick">✓</span> A measurable textile-waste footprint</li>
+        </ul>
+      </div>
+      <p style="font-size: 0.84rem; color: #a9c9b3;">ThreadAI · Full Stack Development Micro Project</p>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-box">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue to your dashboard.</p>
+
+        <div class="alert warn show" id="pageAlert" style="display: none;"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+            <p class="error-msg">Enter a valid email address.</p>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+              <button type="button" class="pw-toggle">SHOW</button>
+            </div>
+            <p class="error-msg">Password is required.</p>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 10px;">
+            <label class="checkbox-row">
+              <input type="checkbox" checked />
+              <span>Remember me</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign In</button>
+        </form>
+
+        <p class="auth-alt">
+          Don't have an account? <a href="register.html">Create one free</a>
+        </p>
+        <p class="auth-alt" style="margin-top: 10px;">
+          <a href="admin.html">Admin? Sign in here →</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    /* ----- Real login against the Express API ----- */
+    const params = new URLSearchParams(window.location.search);
+    const pageAlert = document.getElementById("pageAlert");
+
+    function showAlert(msg, kind) {
+      pageAlert.className = "alert show " + (kind || "warn");
+      pageAlert.textContent = msg;
+      pageAlert.style.display = "block";
+    }
+
+    if (params.get("registered") === "1") {
+      showAlert("Account created — sign in with your new credentials.", "info");
+    }
+    if (params.get("error") === "admin") {
+      showAlert("Administrator access required. Sign in with an admin account.", "warn");
+    }
+    if (params.get("expired") === "1") {
+      showAlert("Your session has expired. Please sign in again.", "warn");
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+      const btn = document.getElementById("loginBtn");
+
+      clearApiErrors(form);
+      const ok = [
+        validateEmail(email),
+        setFieldError(password, password.value.length < 1),
+      ].every(Boolean);
+      if (!ok) return;
+
+      setLoading(btn, true, "Signing in…");
+      try {
+        const data = await API.post("/api/auth/login", {
+          email: email.value.trim(),
+          password: password.value,
+        });
+        toast("Signed in", `Welcome back, ${data.user.full_name.split(" ")[0]}!`);
+
+        const next = params.get("next");
+        const target =
+          data.user.role === "admin" && (!next || next === "index.html")
+            ? "admin.html"
+            : next || "dashboard.html";
+        setTimeout(() => (window.location.href = target), 500);
+      } catch (err) {
+        if (err.status === 401) {
+          showAlert("Invalid email or password.", "warn");
+        } else if (err.status === 0) {
+          showAlert(err.message, "warn");
+        } else {
+          showAlert(err.message, "warn");
+        }
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreadAI — Your Old Clothes. A Smarter Future.</title>
+  <meta name="description" content="ThreadAI is an AI-powered clothing reuse and recycling platform. Discover smarter ways to donate, reuse, and recycle your clothes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">🧵</span>
+        ThreadAI
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">♻ AI-Powered Textile Circularity</span>
+          <h1>Your Old Clothes.<br /><span class="accent">A Smarter Future.</span></h1>
+          <p class="hero-sub">
+            Discover smarter ways to donate, reuse, and recycle your clothes.
+            Upload a photo, get an instant recommendation, and schedule a
+            doorstep pickup — all in one place.
+          </p>
+          <div class="hero-actions">
+            <a href="analyze.html" class="btn btn-primary">
+              Analyze My Clothes
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#how-it-works" class="btn btn-outline">How It Works</a>
+          </div>
+          <div class="hero-trust">
+            <div><strong>3</strong> simple steps</div>
+            <div><strong>2 min</strong> to schedule a pickup</div>
+            <div><strong>100%</strong> doorstep collection</div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-image">
+            <img
+              src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80"
+              alt="Neatly organised rack of reusable clothing"
+              onerror="this.style.display='none'"
+            />
+          </div>
+          <div class="hero-float hero-float-1">
+            <div class="mini-icon">👕</div>
+            <div>
+              <strong>Cotton Shirt</strong>
+              <span>Condition: Good · Donate</span>
+            </div>
+          </div>
+          <div class="hero-float hero-float-2">
+            <div class="mini-icon">♻️</div>
+            <div>
+              <strong>Recommended: Recycle</strong>
+              <span>Worn denim · fibre recovery</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ How it works ============ -->
+    <section class="section section-cream" id="how-it-works">
+      <div class="container">
+        <div class="center" style="margin-bottom: 54px;">
+          <span class="eyebrow">How it works</span>
+          <h2 class="section-title">Three steps to give clothes a second life</h2>
+          <p class="section-lead">
+            ThreadAI turns a pile of unused clothes into a planned donation or
+            recycling pickup — without the usual guesswork.
+          </p>
+        </div>
+
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">1</div>
+            <h3>Upload Clothes</h3>
+            <p>
+              Drop a photo of the clothes you no longer wear. Add the category,
+              condition, and quantity of the items in seconds.
+            </p>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">2</div>
+            <h3>AI Analysis</h3>
+            <p>
+              ThreadAI examines the image and suggests whether your garment is
+              best suited to be <strong>donated</strong>, <strong>reused</strong>,
+              or <strong>recycled</strong>.
+            </p>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">3</div>
+            <h3>Second Life</h3>
+            <p>
+              Schedule a free doorstep pickup, then track your request from
+              <em>Pending</em> all the way to <em>Completed</em>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Features ============ -->
+    <section class="section">
+      <div class="container">
+        <div class="center" style="margin-bottom: 50px;">
+          <span class="eyebrow">Features</span>
+          <h2 class="section-title">Everything you need to declutter responsibly</h2>
+          <p class="section-lead">
+            A clean, guided flow from wardrobe clean-out to verified pickup —
+            built to make textile recycling the easy choice.
+          </p>
+        </div>
+
+        <div class="grid grid-4">
+          <div class="card card-hover reveal">
+            <div class="card-icon">📸</div>
+            <h3>Smart Clothing Analysis</h3>
+            <p>Upload an image and get an instant read on category and estimated condition of the garment.</p>
+          </div>
+          <div class="card card-hover reveal">
+            <div class="card-icon">🌿</div>
+            <h3>Sustainable Recommendations</h3>
+            <p>Clear guidance on whether to donate, reuse, or recycle — with a short explanation for each.</p>
+          </div>
+          <div class="card card-hover reveal">
+            <div class="card-icon">🚚</div>
+            <h3>Pickup Management</h3>
+            <p>Choose a preferred pickup date and share your address. Our demo flow mirrors a real scheduler.</p>
+          </div>
+          <div class="card card-hover reveal">
+            <div class="card-icon">📍</div>
+            <h3>Request Tracking</h3>
+            <p>Follow every request through a visual timeline: Pending → Accepted → Picked Up → Completed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Environmental impact ============ -->
+    <section class="section-sm">
+      <div class="container">
+        <div class="impact reveal">
+          <span class="eyebrow" style="background: rgba(255,255,255,0.16); color: #dceadd;">Environmental impact</span>
+          <h2 class="section-title">Textile waste is a solvable problem</h2>
+          <p style="color: #cfe3d5; max-width: 620px;">
+            Every garment that gets a second life keeps usable fabric out of
+            landfill and reduces the demand for virgin fibre.
+          </p>
+
+          <div class="impact-grid">
+            <div class="impact-item">
+              <strong>92M tons</strong>
+              <span>Textile waste produced globally each year</span>
+            </div>
+            <div class="impact-item">
+              <strong>&lt; 15%</strong>
+              <span>Of discarded clothing is currently reused or recycled</span>
+            </div>
+            <div class="impact-item">
+              <strong>2,700 L</strong>
+              <span>Water to produce a single new cotton shirt</span>
+            </div>
+            <div class="impact-item">
+              <strong>1 garment</strong>
+              <span>Kept in use can save several kilograms of CO₂</span>
+            </div>
+          </div>
+
+          <p class="impact-note">
+            ⓘ Figures are widely cited illustrative industry estimates, shown to
+            demonstrate this UI — they are not measured by ThreadAI.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-band reveal">
+          <div>
+            <h2>Ready to give your clothes a second life?</h2>
+            <p>Start with a quick analysis, then schedule a free doorstep pickup.</p>
+          </div>
+          <div class="hero-actions" style="margin: 0;">
+            <a href="analyze.html" class="btn btn-primary">Analyze My Clothes</a>
+            <a href="register.html" class="btn btn-light">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+          <p>
+            An AI-powered clothing reuse and recycling platform — built as a
+            Full Stack Development micro project to reduce textile waste and
+            promote sustainable fashion.
+          </p>
+          <div class="demo-note">
+            🧪 <strong>Demo prototype:</strong> Phase 1 is frontend-only. Data,
+            analysis results, and submissions are simulated — no backend is
+            connected yet.
+          </div>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="analyze.html">Analyze Clothes</a></li>
+            <li><a href="pickup.html">Pickup Request</a></li>
+            <li><a href="requests.html">My Requests</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+            <li><a href="admin.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="about.html">Sustainability</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>Give Every Thread a Second Life 🌱</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

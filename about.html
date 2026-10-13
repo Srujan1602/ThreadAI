@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — ThreadAI</title>
+  <meta name="description" content="Why ThreadAI exists: reducing textile waste through clothing reuse and responsible recycling." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html" class="active">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ Page head ============ -->
+    <section class="page-head">
+      <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> / About</div>
+        <h1>About ThreadAI</h1>
+        <p>
+          An AI-powered clothing reuse and recycling platform — built as a Full
+          Stack Development micro project to make responsible clothing disposal
+          the easy choice.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Story ============ -->
+    <section class="section">
+      <div class="container grid grid-2" style="align-items: center; gap: 56px;">
+        <div class="about-hero-img">
+          <img
+            src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1000&q=80"
+            alt="Clothes prepared for reuse and donation"
+            onerror="this.style.display='none'"
+          />
+        </div>
+        <div>
+          <span class="eyebrow">Our purpose</span>
+          <h2 class="section-title">Clothes should never go to waste quietly</h2>
+          <p style="color: var(--muted); margin-bottom: 16px;">
+            Most of us own more clothes than we wear. When they stop being
+            useful, they are usually thrown away — even though wearable textiles
+            could be donated and worn again, and unwearable ones can still be
+            shredded into new fibre.
+          </p>
+          <p style="color: var(--muted); margin-bottom: 16px;">
+            ThreadAI closes that gap. A user uploads a photo of an unwanted
+            garment, the system recommends the best next step —
+            <strong>donate</strong>, <strong>reuse</strong>, or
+            <strong>recycle</strong> — and a doorstep pickup is scheduled. An
+            admin then manages each request until the pickup is completed.
+          </p>
+          <div class="team-note">
+            <strong style="color: var(--forest);">🌱 This is a student micro project.</strong>
+            <p style="font-size: 0.9rem; color: var(--muted); margin-top: 6px;">
+              Phase 1 (this prototype) is a frontend-only UI with sample data.
+              The backend API, database, user authentication, and the actual AI
+              model integration arrive in Phase 2.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Values ============ -->
+    <section class="section section-cream">
+      <div class="container">
+        <div class="center" style="margin-bottom: 50px;">
+          <span class="eyebrow">What we stand for</span>
+          <h2 class="section-title">Three goals behind every request</h2>
+        </div>
+        <div class="grid grid-3">
+          <div class="card card-hover value-card reveal">
+            <div class="card-icon">🗑️➡️👗</div>
+            <h3>Reduce Textile Waste</h3>
+            <p>
+              Keep usable clothing out of landfills and incinerators by giving
+              every garment a planned next step instead of a rushed throw-away.
+            </p>
+          </div>
+          <div class="card card-hover value-card reveal">
+            <div class="card-icon">🔁</div>
+            <h3>Clothing Reuse</h3>
+            <p>
+              Wearable items are routed to donation so they can be worn again —
+              the most impactful option for both people and the planet.
+            </p>
+          </div>
+          <div class="card card-hover value-card reveal">
+            <div class="card-icon">♻️</div>
+            <h3>Responsible Recycling</h3>
+            <p>
+              Garments beyond reuse are sent for fibre recovery, turning old
+              fabric into new material instead of waste.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ How it fits together ============ -->
+    <section class="section">
+      <div class="container">
+        <div class="center" style="margin-bottom: 50px;">
+          <span class="eyebrow">System overview</span>
+          <h2 class="section-title">How the platform fits together</h2>
+          <p class="section-lead">
+            A quick look at the full-stack architecture this prototype is built
+            for — helpful for project presentations and viva explanations.
+          </p>
+        </div>
+
+        <div class="grid grid-4">
+          <div class="card reveal">
+            <div class="card-icon">🖥️</div>
+            <h3>Frontend</h3>
+            <p>HTML, CSS, and JavaScript pages — the interface you're using now (Phase 1).</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">⚙️</div>
+            <h3>Backend API</h3>
+            <p>Server endpoints for registration, login, requests, and status updates (Phase 2).</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">🗄️</div>
+            <h3>Database</h3>
+            <p>Stores users and clothing pickup requests with their status history (Phase 2).</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">🤖</div>
+            <h3>AI Model</h3>
+            <p>Image classification that predicts category, condition, and recommendation (Phase 2).</p>
+          </div>
+        </div>
+
+        <div class="cta-band reveal" style="margin-top: 54px;">
+          <div>
+            <h2>Want to see it in action?</h2>
+            <p>Try the demo analyzer, or browse the sample request tracker.</p>
+          </div>
+          <div class="hero-actions" style="margin: 0;">
+            <a href="analyze.html" class="btn btn-primary">Analyze Clothes</a>
+            <a href="contact.html" class="btn btn-light">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+          <p>An AI-powered clothing reuse and recycling platform for a more sustainable fashion future.</p>
+          <div class="demo-note">🧪 <strong>Demo prototype:</strong> Phase 1 is frontend-only — no backend or AI model is connected yet.</div>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="analyze.html">Analyze Clothes</a></li>
+            <li><a href="pickup.html">Pickup Request</a></li>
+            <li><a href="requests.html">My Requests</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="admin.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>Give Every Thread a Second Life 🌱</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

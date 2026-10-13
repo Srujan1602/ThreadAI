@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard — ThreadAI</title>
+  <meta name="description" content="Your ThreadAI dashboard: pickup request stats and recent activity." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-protected="user">
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Dashboard layout ============ -->
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="side-title">Menu</div>
+      <a href="dashboard.html" class="active">📊 Overview</a>
+      <a href="analyze.html">📸 Analyze Clothes</a>
+      <a href="pickup.html">🚚 New Pickup Request</a>
+      <a href="requests.html">📋 My Requests</a>
+      <div class="side-divider"></div>
+      <div class="side-title">Account</div>
+      <a href="about.html">ℹ️ About ThreadAI</a>
+      <a href="contact.html">✉️ Contact Support</a>
+      <a href="#" id="logoutLink">🚪 Logout</a>
+      <div class="side-user">
+        <div class="avatar" id="userAvatar">…</div>
+        <div>
+          <strong id="userName">Loading…</strong>
+          <span id="userEmail"></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+      <div class="dash-head">
+        <div>
+          <h1 id="welcome">Welcome back 👋</h1>
+          <p>Here's a summary of your clothing donation and recycling activity.</p>
+        </div>
+        <a href="analyze.html" class="btn btn-primary">+ Analyze New Clothes</a>
+      </div>
+
+      <div id="globalError" class="alert warn show" style="display: none;"></div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">📦</div></div>
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-label">Total Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">⏳</div></div>
+          <div class="stat-num" id="statPending">—</div>
+          <div class="stat-label">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">🤝</div></div>
+          <div class="stat-num" id="statAccepted">—</div>
+          <div class="stat-label">Accepted Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon">✅</div></div>
+          <div class="stat-num" id="statCompleted">—</div>
+          <div class="stat-label">Completed Pickups</div>
+        </div>
+      </div>
+
+      <!-- Recent requests -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Recent Requests</h2>
+          <a href="requests.html" class="btn btn-outline btn-sm">View All Requests</a>
+        </div>
+        <div id="recentWrap">
+          <div class="panel-body" id="recentLoading"></div>
+        </div>
+      </div>
+
+      <!-- Timeline + tips -->
+      <div class="grid grid-2">
+        <div class="panel" style="margin: 0;">
+          <div class="panel-head"><h2>Request Status Flow</h2></div>
+          <div class="panel-body">
+            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 6px;">
+              Every request moves through five stages:
+            </p>
+            <div class="timeline" style="margin-top: 18px;">
+              <div class="tl-step done"><span class="tl-label">Pending</span></div>
+              <div class="tl-step done"><span class="tl-label">Accepted</span></div>
+              <div class="tl-step done current"><span class="tl-label">Pickup Scheduled</span></div>
+              <div class="tl-step"><span class="tl-label">Picked Up</span></div>
+              <div class="tl-step"><span class="tl-label">Completed</span></div>
+            </div>
+            <p style="font-size: 0.86rem; color: var(--muted); margin-top: 20px;">
+              Statuses are updated by the admin from the Admin Dashboard.
+            </p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin: 0;">
+          <div class="panel-head"><h2>🌱 Sustainability Tips</h2></div>
+          <div class="panel-body">
+            <ul style="display: grid; gap: 14px;">
+              <li style="display: flex; gap: 12px; font-size: 0.93rem; color: var(--muted);">
+                <span>🧺</span> Wash and dry clothes before scheduling a pickup — clean textiles are far easier to reuse.
+              </li>
+              <li style="display: flex; gap: 12px; font-size: 0.93rem; color: var(--muted);">
+                <span>👕</span> Items in “Like New” or “Good” condition are best for donation; torn or faded items suit recycling.
+              </li>
+              <li style="display: flex; gap: 12px; font-size: 0.93rem; color: var(--muted);">
+                <span>📦</span> Pack pieces in one sturdy bag and label it with your request code.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/helpers.js"></script>
+  <script>
+    /* ----- Dashboard: real stats from MySQL via /api/requests/summary ----- */
+    const recentWrap = document.getElementById("recentWrap");
+    const globalError = document.getElementById("globalError");
+
+    function showError(msg) {
+      globalError.textContent = msg;
+      globalError.style.display = "block";
+    }
+
+    async function loadDashboard() {
+      // --- signed-in user ---
+      try {
+        const me = await API.get("/api/auth/me");
+        const first = me.user.full_name.split(" ")[0];
+        document.getElementById("welcome").textContent = `Welcome back, ${first} 👋`;
+        document.getElementById("userName").textContent = me.user.full_name;
+        document.getElementById("userEmail").textContent = me.user.email;
+        document.getElementById("userAvatar").textContent = me.user.full_name
+          .split(" ")
+          .map((n) => n[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
+      } catch (_err) {
+        return; // 401 → api.js redirects to login
+      }
+
+      document.getElementById("logoutLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        logout();
+      });
+
+      // --- statistics ---
+      recentWrap.innerHTML = '<div class="panel-body">' + loadingStateHtml("Loading your stats…") + "</div>";
+      try {
+        const [sumRes, listRes] = await Promise.all([
+          API.get("/api/requests/summary"),
+          API.get("/api/requests?limit=5"),
+        ]);
+        const s = sumRes.summary;
+        document.getElementById("statTotal").textContent = s.total;
+        document.getElementById("statPending").textContent = s.pending;
+        document.getElementById("statAccepted").textContent = s.accepted;
+        document.getElementById("statCompleted").textContent = s.completed;
+
+        if (!listRes.requests.length) {
+          recentWrap.innerHTML =
+            '<div class="panel-body">' +
+            emptyStateHtml("🌱", "No requests yet", "Schedule your first pickup to see it here.") +
+            "</div>";
+          return;
+        }
+
+        recentWrap.innerHTML = `
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Request Code</th>
+                  <th>Clothing</th>
+                  <th>Type</th>
+                  <th>Qty</th>
+                  <th>Pickup Date</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="recentBody">
+                ${listRes.requests
+                  .map(
+                    (r) => `
+                  <tr>
+                    <td><span class="mono">${escapeHtml(r.request_code || "#" + r.id)}</span></td>
+                    <td><strong>${escapeHtml(r.clothing_category)}</strong></td>
+                    <td>${typeEmoji(r.request_type)} ${typeLabel(r.request_type)}</td>
+                    <td>${r.quantity}</td>
+                    <td>${formatDate(r.pickup_date)}</td>
+                    <td>${statusBadge(r.status)}</td>
+                    <td><a class="btn btn-ghost btn-sm" href="requests.html">View →</a></td>
+                  </tr>`
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>`;
+      } catch (err) {
+        showError(`Could not load dashboard data: ${err.message}`);
+        recentWrap.innerHTML = errorStateHtml(
+          "Stats unavailable",
+          "The server could not be reached. Make sure the backend is running, then refresh."
+        );
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

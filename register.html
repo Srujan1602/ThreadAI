@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — ThreadAI</title>
+  <meta name="description" content="Register a free ThreadAI account." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Auth split layout ============ -->
+  <div class="auth-page">
+    <aside class="auth-aside">
+      <div>
+        <a href="index.html" class="logo" style="color: #fff;"><span class="logo-mark">🧵</span>ThreadAI</a>
+        <h2 style="margin-top: 34px;">Join the second-life movement.</h2>
+        <p>Create an account to analyze your wardrobe, schedule pickups, and watch your textile-waste impact grow.</p>
+        <ul class="auth-points">
+          <li><span class="tick">✓</span> Free forever for individual donors</li>
+          <li><span class="tick">✓</span> Personal dashboard for all your requests</li>
+          <li><span class="tick">✓</span> Pickup history and status timelines</li>
+          <li><span class="tick">✓</span> Tips to donate, reuse, and recycle smarter</li>
+        </ul>
+      </div>
+      <p style="font-size: 0.84rem; color: #a9c9b3;">ThreadAI · Full Stack Development Micro Project</p>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-box" style="max-width: 480px;">
+        <h1>Create your account</h1>
+        <p>It takes less than a minute.</p>
+
+        <div class="alert warn show" id="pageAlert" style="display: none;"></div>
+
+        <form id="registerForm" novalidate>
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="full_name" placeholder="e.g. Priya Sharma" autocomplete="name" />
+            <p class="error-msg">Please enter your full name (at least 3 characters).</p>
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+            <p class="error-msg">Enter a valid email address.</p>
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone number <span style="opacity:.65; font-weight:500;">(optional)</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="Only needed for pickup updates" autocomplete="tel" />
+            <p class="error-msg">Enter a valid phone number (8–15 digits).</p>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" name="password" placeholder="At least 6 characters" autocomplete="new-password" />
+              <button type="button" class="pw-toggle">SHOW</button>
+            </div>
+            <p class="error-msg">Password must be at least 6 characters.</p>
+          </div>
+
+          <div class="field">
+            <label for="confirm">Confirm password</label>
+            <div class="password-wrap">
+              <input type="password" id="confirm" name="confirm" placeholder="Repeat your password" autocomplete="new-password" />
+              <button type="button" class="pw-toggle">SHOW</button>
+            </div>
+            <p class="error-msg">Passwords do not match.</p>
+          </div>
+
+          <div class="field">
+            <label class="checkbox-row">
+              <input type="checkbox" id="terms" />
+              <span>I agree to the Terms of Service and Privacy Policy.</span>
+            </label>
+            <p class="error-msg">You must agree to continue.</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="registerBtn">Create Account</button>
+        </form>
+
+        <p class="auth-alt">
+          Already have an account? <a href="login.html">Sign in</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    /* ----- Real registration against the Express API ----- */
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+
+      const name = document.getElementById("name");
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phone");
+      const password = document.getElementById("password");
+      const confirm = document.getElementById("confirm");
+      const terms = document.getElementById("terms");
+      const btn = document.getElementById("registerBtn");
+
+      clearApiErrors(form);
+      const checks = [
+        validateMinLength(name, 3),
+        validateEmail(email),
+        // Phone is optional: only validate it when the user typed something.
+        phone.value.trim() ? validatePhone(phone) : setFieldError(phone, false),
+        validateMinLength(password, 6),
+        validateMatch(password, confirm),
+        setFieldError(terms, !terms.checked),
+      ];
+      if (checks.includes(false)) {
+        const first = document.querySelector(".field.error");
+        if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+        toast("Check the form", "Please fix the highlighted fields.", "error");
+        return;
+      }
+
+      setLoading(btn, true, "Creating account…");
+      try {
+        const payload = {
+          full_name: name.value.trim(),
+          email: email.value.trim(),
+          password: password.value,
+        };
+        const phoneVal = phone.value.trim();
+        if (phoneVal) payload.phone = phoneVal; // omitted entirely when blank
+        await API.post("/api/auth/register", payload);
+        toast("Account created", "You can sign in now.");
+        setTimeout(() => (window.location.href = "login.html?registered=1"), 700);
+      } catch (err) {
+        setLoading(btn, false);
+        if (err.errors && showApiErrors(form, err)) {
+          const first = document.querySelector(".field.error");
+          if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        const alertEl = document.getElementById("pageAlert");
+        alertEl.className = "alert show warn";
+        alertEl.style.display = "block";
+        alertEl.textContent = err.message;
+        toast("Registration failed", err.message, "error");
+      }
+    });
+  </script>
+</body>
+</html>

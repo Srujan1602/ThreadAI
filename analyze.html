@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analyze Clothes — ThreadAI</title>
+  <meta name="description" content="Upload a clothing photo and get an AI recommendation to donate, reuse, or recycle." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Navbar ============ -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="analyze.html" class="active">Analyze</a>
+        <a href="pickup.html">Pickup Request</a>
+        <a href="requests.html">My Requests</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost" id="navDash">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="navAuth">Login</a>
+        <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ Page head ============ -->
+    <section class="page-head">
+      <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Analyze Clothes</div>
+        <h1>Analyze Your Clothes</h1>
+        <p>
+          Upload a photo of the garment you want to pass on, and ThreadAI's model
+          will suggest whether it should be donated, reused, or recycled.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Analysis workspace ============ -->
+    <section class="section">
+      <div class="container" style="max-width: 900px;">
+
+        <!-- Server/AI status: filled in by /api/analyze/status on load -->
+        <div class="alert warn" id="statusBanner"></div>
+
+        <!-- Upload card -->
+        <div class="card" style="padding: 32px; margin-bottom: 28px;">
+          <div class="dropzone" id="dropzone">
+            <div class="dz-icon">📸</div>
+            <h3>Drag &amp; drop your clothing image</h3>
+            <p>or use the button below — JPG / PNG / WEBP, up to 8 MB</p>
+            <button type="button" class="btn btn-outline" id="browseBtn">Browse Images</button>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden />
+          </div>
+
+          <div class="dz-preview" id="preview">
+            <button type="button" class="remove-img" id="removeImg" title="Remove image">✕</button>
+            <img id="previewImg" alt="Selected clothing preview" />
+            <p class="center" style="margin-top: 14px; color: var(--muted); font-size: 0.9rem;">
+              <span id="fileName" class="mono"></span> · ready for analysis
+            </p>
+          </div>
+
+          <div class="alert warn" id="uploadError" style="margin-top: 18px;"></div>
+
+          <div style="display: flex; gap: 14px; justify-content: center; margin-top: 26px; flex-wrap: wrap;">
+            <button class="btn btn-primary" id="analyzeBtn" disabled>
+              Analyze Clothing
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+
+          <div class="pulse-loading" id="loading">
+            <div class="spinner"></div>
+            Analyzing fabric, category &amp; condition…
+          </div>
+        </div>
+
+        <!-- Result card (hidden until a real analysis returns) -->
+        <div class="result-card" id="resultCard" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div>
+              <span class="eyebrow" style="margin-bottom: 8px;">Analysis result</span>
+              <h2 style="font-size: 1.5rem;">Here's what we found</h2>
+            </div>
+            <span class="badge badge-accepted" id="aiBadge">AI analysis</span>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-metric">
+              <div class="label">Clothing category</div>
+              <div class="value" id="resCategory">—</div>
+            </div>
+            <div class="result-metric">
+              <div class="label">Estimated condition</div>
+              <div class="value" id="resCondition">—</div>
+            </div>
+            <div class="result-metric">
+              <div class="label">Model confidence</div>
+              <div class="value" id="confVal">0%</div>
+              <div class="confidence-bar"><i id="confBar"></i></div>
+            </div>
+          </div>
+
+          <div class="card" style="background: var(--sage-pale); border-color: var(--sage); box-shadow: none; margin-bottom: 26px;">
+            <h3 style="font-size: 1.05rem; margin-bottom: 6px;">Why this recommendation?</h3>
+            <p style="color: var(--ink);" id="resExplanation">—</p>
+          </div>
+
+          <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Your options</h3>
+          <div class="rec-cards">
+            <div class="rec-card" id="recDonate">
+              <div class="rec-emoji">💚</div>
+              <h4>Donate</h4>
+              <p>Pass it on in its current condition — ideal for reusable clothing drives.</p>
+            </div>
+            <div class="rec-card" id="recReuse">
+              <div class="rec-emoji">🔁</div>
+              <h4>Reuse</h4>
+              <p>Repair, upcycle, or resell to keep the garment in your own wardrobe loop.</p>
+            </div>
+            <div class="rec-card" id="recRecycle">
+              <div class="rec-emoji">♻️</div>
+              <h4>Recycle</h4>
+              <p>Send worn-out textiles for fibre recovery when reuse is no longer possible.</p>
+            </div>
+          </div>
+
+          <div class="alert warn" id="disclaimer" style="margin-top: 22px;"></div>
+
+          <div style="display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap;">
+            <a href="pickup.html" class="btn btn-primary" id="proceedBtn">Use this result &amp; request pickup</a>
+            <button class="btn btn-outline" id="resetBtn">Analyze another image</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo"><span class="logo-mark">🧵</span>ThreadAI</a>
+          <p>An AI-powered clothing reuse and recycling platform for a more sustainable fashion future.</p>
+          <div class="demo-note">🔬 Clothing analysis is performed by a real AI vision model via the ThreadAI backend — your photo is sent only to the AI provider for analysis and is never stored on our server.</div>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="analyze.html">Analyze Clothes</a></li>
+            <li><a href="pickup.html">Pickup Request</a></li>
+            <li><a href="requests.html">My Requests</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="admin.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span class="year-now">2026</span> ThreadAI · Full Stack Development Micro Project</span>
+        <span>Give Every Thread a Second Life 🌱</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    /* ----- Real AI clothing analysis: POST /api/analyze ----- */
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const browseBtn = document.getElementById("browseBtn");
+    const preview = document.getElementById("preview");
+    const previewImg = document.getElementById("previewImg");
+    const fileName = document.getElementById("fileName");
+    const removeImg = document.getElementById("removeImg");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const loading = document.getElementById("loading");
+    const resultCard = document.getElementById("resultCard");
+    const resetBtn = document.getElementById("resetBtn");
+    const proceedBtn = document.getElementById("proceedBtn");
+    const statusBanner = document.getElementById("statusBanner");
+    const uploadError = document.getElementById("uploadError");
+
+    const MAX_BYTES = 8 * 1024 * 1024;
+    const ACCEPTED = ["image/jpeg", "image/png", "image/webp"];
+
+    let selectedFile = null;
+    let lastAnalysis = null; // stored for the pickup prefill
+
+    function showError(msg) {
+      uploadError.textContent = msg;
+      uploadError.classList.add("show");
+    }
+    function clearError() {
+      uploadError.textContent = "";
+      uploadError.classList.remove("show");
+    }
+
+    /* --- Check whether the AI is configured on the backend --- */
+    API.get("/api/analyze/status")
+      .then((s) => {
+        if (!s.configured) {
+          statusBanner.innerHTML =
+            "⚠️ <strong>AI analysis is not enabled on this server yet.</strong> " +
+            "You can still upload an image, but requests will fail until an administrator " +
+            "sets <code>GEMINI_API_KEY</code> in <code>backend/.env</code> and restarts the backend.";
+          statusBanner.classList.add("show");
+        }
+      })
+      .catch(() => {
+        statusBanner.textContent =
+          "⚠️ Could not reach the backend. Start it with: cd backend && npm start";
+        statusBanner.classList.add("show");
+      });
+
+    /* --- File selection (validated here AND again on the server) --- */
+    function loadFile(file) {
+      clearError();
+      if (!file) return;
+      if (!ACCEPTED.includes(file.type)) {
+        showError("Please choose a JPG, PNG, or WEBP image file.");
+        return;
+      }
+      if (file.size > MAX_BYTES) {
+        showError("That image is larger than 8 MB. Please choose a smaller file.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        fileName.textContent = file.name;
+        preview.classList.add("show");
+        selectedFile = file;
+        analyzeBtn.disabled = false;
+        resultCard.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    browseBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+    dropzone.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => loadFile(fileInput.files[0]));
+
+    ["dragenter", "dragover"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => {
+        e.preventDefault();
+        dropzone.classList.add("dragover");
+      })
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("dragover");
+      })
+    );
+    dropzone.addEventListener("drop", (e) => loadFile(e.dataTransfer.files[0]));
+
+    removeImg.addEventListener("click", () => {
+      preview.classList.remove("show");
+      fileInput.value = "";
+      selectedFile = null;
+      analyzeBtn.disabled = true;
+      resultCard.style.display = "none";
+      clearError();
+    });
+
+    /* --- Run the analysis --- */
+    function animateConfidence(target) {
+      const confVal = document.getElementById("confVal");
+      const confBar = document.getElementById("confBar");
+      confVal.textContent = "0%";
+      confBar.style.width = "0";
+      setTimeout(() => {
+        confBar.style.width = target + "%";
+        let n = 0;
+        const step = Math.max(1, Math.round(target / 30));
+        const t = setInterval(() => {
+          n += step;
+          if (n >= target) { n = target; clearInterval(t); }
+          confVal.textContent = n + "%";
+        }, 30);
+      }, 150);
+    }
+
+    function renderResult(data) {
+      const a = data.analysis;
+      lastAnalysis = a;
+
+      document.getElementById("resCategory").textContent =
+        a.category || "Could not determine";
+      document.getElementById("resCondition").textContent =
+        a.condition || "Could not determine";
+
+      if (a.is_clothing === false) {
+        document.getElementById("resExplanation").textContent =
+          (a.explanation ? a.explanation + " " : "") +
+          "Note: this photo may not clearly show a clothing item — the result above is a best guess.";
+      } else {
+        document.getElementById("resExplanation").textContent = a.explanation || "—";
+      }
+
+      // Highlight the recommended option card
+      const map = { Donate: "recDonate", Reuse: "recReuse", Recycle: "recRecycle" };
+      ["recDonate", "recReuse", "recRecycle"].forEach((id) => {
+        document.getElementById(id).classList.remove("best");
+        const tag = document.getElementById(id).querySelector(".rec-tag");
+        if (tag) tag.remove();
+      });
+      const bestId = map[a.recommendation];
+      if (bestId) {
+        const el = document.getElementById(bestId);
+        el.classList.add("best");
+        const tag = document.createElement("span");
+        tag.className = "rec-tag";
+        tag.textContent = "Recommended";
+        el.appendChild(tag);
+      }
+
+      const badge = document.getElementById("aiBadge");
+      badge.textContent = a.confidence != null
+        ? "AI analysis · " + a.confidence + "% confidence"
+        : "AI analysis";
+
+      const disc = document.getElementById("disclaimer");
+      disc.innerHTML =
+        "ℹ️ " + escapeHtml(data.disclaimer || "") +
+        (a.model ? " <span style='opacity:.7'>(model: " + escapeHtml(a.model) + ")</span>" : "");
+      disc.classList.add("show");
+
+      // "Reuse" means keeping it yourself — explain instead of prefilling a request type
+      proceedBtn.textContent =
+        a.recommendation === "Reuse"
+          ? "Still request a pickup"
+          : "Use this result & request pickup";
+
+      if (a.confidence != null) animateConfidence(a.confidence);
+
+      resultCard.style.display = "block";
+      resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!selectedFile) {
+        showError("Please choose an image first.");
+        return;
+      }
+      clearError();
+      analyzeBtn.disabled = true;
+      loading.classList.add("show");
+      resultCard.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("image", selectedFile, selectedFile.name);
+
+      try {
+        const data = await API.upload("/api/analyze", formData);
+        renderResult(data);
+        toast("Analysis complete", "Here's the AI recommendation for your item.");
+      } catch (err) {
+        if (err.status === 401) {
+          window.location.href = "login.html?next=analyze.html";
+          return;
+        }
+        if (err.status === 429) {
+          showError("Too many analyses in a short time — please wait a few minutes and try again.");
+        } else {
+          showError(err.message || "Analysis failed. Please try again.");
+        }
+      } finally {
+        loading.classList.remove("show");
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    /* --- Hand the result to the pickup form, then reset --- */
+    proceedBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (lastAnalysis) {
+        try {
+          sessionStorage.setItem("threadai_analysis", JSON.stringify({
+            category: lastAnalysis.category,
+            condition: lastAnalysis.condition,
+            recommendation: lastAnalysis.recommendation,
+            explanation: lastAnalysis.explanation,
+            at: Date.now(),
+          }));
+        } catch (_err) {
+          /* storage full/blocked — pickup page simply opens empty */
+        }
+      }
+      window.location.href = "pickup.html";
+    });
+
+    resetBtn.addEventListener("click", () => {
+      resultCard.style.display = "none";
+      preview.classList.remove("show");
+      fileInput.value = "";
+      selectedFile = null;
+      lastAnalysis = null;
+      analyzeBtn.disabled = true;
+      clearError();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>

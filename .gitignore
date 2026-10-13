@@ -1,0 +1,13 @@
+node_modules/
+.env
+.tools/
+# Exclude environment files everywhere
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Allow safe example templates
+!.env.example
+!**/.env.example
+*.log
