@@ -11,3 +11,6 @@ node_modules/
 !.env.example
 !**/.env.example
 *.log
+server.log
+# Ignore logs
+*.log
