@@ -114,16 +114,19 @@ app.use("/api", (_req, res) => {
 
 // ---- Static frontend (whitelisted paths only) ----
 // Never expose backend/, database/, .env, node_modules, etc.
+// maxAge 0 + ETag: browsers must revalidate (cheap 304) on every load.
+// A 1h max-age previously pinned stale JS/CSS for up to an hour after a
+// deploy, so users kept running pre-fix code ('Cannot reach the server').
 const ROOT = path.join(__dirname, "..");
 const FRONTEND_INDEX = path.join(ROOT, "index.html");
 
 app.use(
   "/css",
-  express.static(path.join(ROOT, "css"), { dotfiles: "deny", maxAge: "1h" })
+  express.static(path.join(ROOT, "css"), { dotfiles: "deny", maxAge: "0", etag: true })
 );
 app.use(
   "/js",
-  express.static(path.join(ROOT, "js"), { dotfiles: "deny", maxAge: "1h" })
+  express.static(path.join(ROOT, "js"), { dotfiles: "deny", maxAge: "0", etag: true })
 );
 
 app.get("/", (_req, res) => res.sendFile(FRONTEND_INDEX));
