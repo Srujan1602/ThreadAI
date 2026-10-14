@@ -6,13 +6,24 @@
    - Session-aware navigation + protected page redirects
    ===================================================================== */
 
-// When the page is served by the Express backend itself, the API is
-// same-origin (""). When served by another static server (e.g. the
-// Phase 1 `python -m http.server 8000`), point at the backend directly.
+// Default: same-origin (""), which is correct when the page is served by
+// the Express backend locally (:5000) AND in production (Railway, Render,
+// tunnels) — the API always lives on the page's own host.
+// The only case needing an absolute base is the Phase 1 static server
+// (`python -m http.server 8000`) on localhost — detect that narrowly so a
+// deployed site NEVER targets 127.0.0.1 (that broke on Railway: the page
+// tried to reach the visitor's own laptop instead of the server).
 // Override any time with: window.THREADAI_API_BASE = "http://127.0.0.1:5000";
+const THREADAI_HOST = window.location.hostname;
+const THREADAI_IS_LOCAL =
+  THREADAI_HOST === "localhost" ||
+  THREADAI_HOST === "127.0.0.1" ||
+  THREADAI_HOST === "[::1]";
 window.THREADAI_API_BASE =
   typeof window.THREADAI_API_BASE === "undefined"
-    ? (window.location.port === "5000" ? "" : "http://127.0.0.1:5000")
+    ? THREADAI_IS_LOCAL && window.location.port !== "5000"
+      ? "http://127.0.0.1:5000"
+      : ""
     : window.THREADAI_API_BASE;
 
 const API_BASE = window.THREADAI_API_BASE;
