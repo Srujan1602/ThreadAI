@@ -16,3 +16,6 @@ server.log
 *.log
 .DS_Store
 Thumbs.db
+# Local runtime + leftover nested repo
+.run/
+ThreadAI/

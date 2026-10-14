@@ -1,0 +1,47 @@
+# =====================================================================
+# Render Blueprint — ThreadAI / ReWear
+# Deploys the backend (which also serves the static frontend) as a
+# free-tier web service. Choose "New +" → "Blueprint" on Render and
+# point it at this repository.
+#
+# Values marked `sync: false` are set by YOU in the Render dashboard
+# (Environment tab) — they are never stored in this file:
+#   DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME   (from Aiven/TiDB)
+#   GEMINI_API_KEY                                    (only if leaving demo mode)
+# =====================================================================
+services:
+  - type: web
+    name: threadai-rewear
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Demo clothing analysis: no AI calls, no API key needed in prod.
+      # Set to "false" in the dashboard AND add GEMINI_API_KEY to go real.
+      - key: DEMO_MODE
+        value: "true"
+      # Session cookie hardening — Render serves HTTPS, so Secure is safe.
+      - key: COOKIE_SECURE
+        value: "true"
+      # JWT signing secret — Render generates a random value once.
+      - key: JWT_SECRET
+        generateValue: true
+      # Database — paste the connection details from your free MySQL
+      # service (Aiven for MySQL free tier or TiDB Serverless):
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      # Same-origin frontend + API: no CORS_ORIGIN needed (the server
+      # allows any origin whose host matches its own Host header).

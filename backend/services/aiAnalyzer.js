@@ -147,6 +147,13 @@ function buildBody(buffer, mimeType, withSchema) {
   const generationConfig = {
     temperature: 0.2,
     responseMimeType: "application/json",
+    // Gemini 3.8 Flash defaults to "medium" thinking, which can reason for a
+    // minute+ on a simple garment photo and blow the request timeout.
+    // The correct field is `thinkingConfig.thinkingLevel` (camelCase, NESTED
+    // inside generationConfig) — a top-level `thinking_level` or the legacy
+    // `thinking_config.thinking_budget` are ignored/invalid on 3.x. "low" is
+    // the fastest supported level ("minimal" is not supported on 3.8 Flash).
+    thinkingConfig: { thinkingLevel: "low" },
   };
   if (withSchema) generationConfig.responseSchema = RESPONSE_SCHEMA;
 
@@ -178,7 +185,7 @@ function extractText(payload) {
     .join("");
 }
 
-async function callGemini(key, body, timeoutMs) {
+async function callGeminiOnce(key, body, timeoutMs) {
   const model = (process.env.GEMINI_MODEL || DEFAULT_MODEL).trim() || DEFAULT_MODEL;
   const url = `${GEMINI_URL}/${encodeURIComponent(model)}:generateContent`;
 
@@ -211,6 +218,26 @@ async function callGemini(key, body, timeoutMs) {
   }
 
   return { status: res.status, payload };
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* Gemini intermittently returns 503 ("high demand") or 502 under load. A single
+   spike would otherwise abort the user's whole analysis for no fault of their
+   own, so we retry transient statuses a couple of times with short backoff.
+   401/403/400/429 are NOT retried — they indicate a config or quota problem that
+   a retry cannot fix, and retrying would only mask a clear error message. */
+async function callGemini(key, body, timeoutMs) {
+  const maxAttempts = 3;
+  let last = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    last = await callGeminiOnce(key, body, timeoutMs);
+    const transient =
+      last.status === 502 || last.status === 503 || last.status === 504 || last.status === 0;
+    if (!transient || attempt === maxAttempts) return last;
+    await sleep(attempt * 1500); // 1.5s, then 3s
+  }
+  return last;
 }
 
 /**
@@ -252,6 +279,16 @@ async function analyzeClothingImage(buffer, mimeType) {
       payload && payload.error && payload.error.message
         ? String(payload.error.message).slice(0, 300)
         : `HTTP ${status}`;
+    // Transient provider states (high demand / overloaded / gateway) are not a
+    // config problem — surface them under their own code so the controller can
+    // return a 503 with an honest "busy, try again shortly" message instead of
+    // a permanent-looking 502.
+    if (status === 502 || status === 503 || status === 504) {
+      throw new AiError(
+        "The AI service is temporarily busy. Please try again in a moment.",
+        "AI_UNAVAILABLE"
+      );
+    }
     throw new AiError(`The AI service returned an error: ${reason}`, "AI_UPSTREAM");
   }
 

@@ -1904,4 +1904,16 @@ tbody td strong { color: var(--ink); font-weight: 600; }
   .detail-list .detail-row { grid-template-columns: 1fr; gap: 3px; }
   .toolbar .btn { width: 100%; }
   .dz-preview .remove-img { right: 12px; }
+  /* Result-card action buttons are long ("Use this result & request pickup"):
+     let them wrap instead of pushing a horizontal scrollbar on small phones. */
+  .result-card .btn { white-space: normal; max-width: 100%; text-align: center; }
+  /* Logo + actions + 24px gap overflowed the navbar below ~347px viewports. */
+  .navbar-inner { gap: 8px; }
+  .nav-actions .btn { padding: 8px 14px; }
+  /* Below ~370px the 18px gutter still left the navbar row (logo + auth +
+     44px toggle) overflowing horizontally. A 14px gutter fits down to
+     320px without touching any other layout. */
+  .container { padding: 0 14px; }
+  /* Toasts are fixed 280-360px wide; keep them inside narrow viewports. */
+  .toast { min-width: 0; max-width: calc(100vw - 52px); }
 }

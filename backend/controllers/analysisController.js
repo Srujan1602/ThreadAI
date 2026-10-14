@@ -107,21 +107,20 @@ const DEMO_OUTCOMES = {
 };
 
 /** Build the simulated analysis. Pure function — same inputs, same output. */
-function buildDemoAnalysis(category, condition) {
+function buildDemoAnalysis(category, condition, categoryLabel, conditionLabel) {
   const outcome = DEMO_OUTCOMES[condition];
-  const label = category === "Other" ? "garment" : category;
   return {
     is_clothing: true,
     category: category === "Other" ? null : category,
     condition,
     recommendation: outcome.recommendation,
     explanation:
-      `Simulated assessment: a ${label} in ${condition.toLowerCase()} condition ` +
-      `— a ${outcome.summary}. ${outcome.note}`,
+      `Simulated assessment: your ${categoryLabel} is in ${conditionLabel.toLowerCase()} ` +
+      `condition — ${outcome.summary}. ${outcome.note}`,
     confidence: null, // never fabricate a confidence number in demo mode
     model: null,
     demo: true,
-    summary: `${label} · ${condition} condition`,
+    summary: `${categoryLabel} · ${conditionLabel} condition`,
     donation_suitability: outcome.suitability,
     next_step: outcome.next_step,
   };
@@ -196,7 +195,9 @@ async function analyze(req, res, next) {
         return res.status(400).json({ ok: false, errors, error: "Please select a category and condition." });
       }
 
-      const analysis = buildDemoAnalysis(category, condition);
+      const categoryLabel = str(req.body.category_label).replace(/[<>]/g, "").slice(0, 40) || category;
+      const conditionLabel = str(req.body.condition_label).replace(/[<>]/g, "").slice(0, 40) || condition;
+      const analysis = buildDemoAnalysis(category, condition, categoryLabel, conditionLabel);
 
       // Persist the labels like a real run so dashboards stay consistent
       // (simulated values are returned to the user clearly labelled as demo).
@@ -237,6 +238,12 @@ async function analyze(req, res, next) {
       }
       if (aiErr.code === "AI_TIMEOUT") {
         return res.status(504).json({ ok: false, code: "AI_TIMEOUT", error: aiErr.message });
+      }
+      // Transient provider overload (Gemini "high demand") — not a config or
+      // key problem. 503 + Retry-After tells the client this is temporary.
+      if (aiErr.code === "AI_UNAVAILABLE") {
+        res.set("Retry-After", "15");
+        return res.status(503).json({ ok: false, code: "AI_UNAVAILABLE", error: aiErr.message });
       }
       // AI_UPSTREAM and anything unexpected from the provider
       return res.status(502).json({ ok: false, code: "AI_UPSTREAM", error: aiErr.message });

@@ -17,10 +17,15 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024, files: 1 },
 });
 
-// Each analysis costs real AI quota — keep per-IP usage bounded.
+// Each real AI analysis costs quota — keep per-IP usage bounded tightly.
+// In DEMO_MODE nothing external is called, so the window is generous enough
+// for a classroom (several students behind one NAT IP) while still bounded.
+const DEMO_MODE = ["true", "1", "yes"].includes(
+  String(process.env.DEMO_MODE || "").toLowerCase()
+);
 const analyzeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 20,
+  limit: DEMO_MODE ? 60 : 20,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { ok: false, error: "Too many analysis requests. Please try again later." },

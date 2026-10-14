@@ -61,6 +61,22 @@ app.use(express.json({ limit: "100kb" })); // request body size limit
 app.use(cookieParser());
 app.use(attachUser);
 
+// ---- Production request log ----
+// Render (and any stdout-capturing host) shows these lines in its Logs tab:
+// one line per request with method, path, status and duration. Only
+// non-sensitive fields are logged — never cookies, bodies or credentials.
+if (IS_PROD) {
+  app.use((req, res, next) => {
+    const started = Date.now();
+    res.on("finish", () => {
+      console.log(
+        `${new Date().toISOString()} ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - started}ms`
+      );
+    });
+    next();
+  });
+}
+
 // ---- CSRF defense: reject state-changing requests from foreign origins ----
 // (the session cookie is httpOnly + SameSite=Lax; this adds an explicit
 //  Origin check for POST/PATCH/PUT/DELETE)
