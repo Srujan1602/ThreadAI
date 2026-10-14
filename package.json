@@ -1,0 +1,12 @@
+{
+  "name": "threadai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ThreadAI root manifest. Lets Railpack detect Node.js; the app lives in backend/.",
+  "scripts": {
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
